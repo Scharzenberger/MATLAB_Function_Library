@@ -54,15 +54,30 @@ num_timesteps = size(L, 2);
 T(:, 1) = T0;
 
 % Compute the muscle tensions & rate of change of muscle tension over time.
-for k = 1:(num_timesteps - 1)              % Iterate through each of the time steps...
+for k1 = 1:(num_timesteps - 1)              % Iterate through each of the time steps...
+    
+    % Retrieve the starting total muscle ten
+    Tint = T(:, k1);
+    
+    for k2 = 1:intRes
+        
+        % Compute the rate of change of the muscle tension at this time step.
+        dTint = ForwardHillMuscleStep( Tint, L(:, k1), dL(:, k1), A(:, k1), kse, kpe, b );
 
-    % Integrate the Hill Muscle Model differential equation for the specified number of steps.
-    [T(:, k + 1), dT(:, k)] = IntegrateForwardHillMuscle( T(:, k), L(:, k), dL(:, k), A(:, k), kse, kpe, b, dt, intRes );
+        % Compute the muscle tension at the next time step.
+        Tint = ForwardEulerStep( Tint, dTint, dt/intRes );
+        
+    end
+    
+    dT(:, k1) = dTint;
+    T(:, k1 + 1) = Tint;
     
 end
 
 % Compute the final rate of change of the muscle tension.
-[~, dT(:, k + 1)] = IntegrateForwardHillMuscle( T(:, k + 1), L(:, k + 1), dL(:, k + 1), A(:, k + 1), kse, kpe, b, dt, intRes );
+dT(:, k1 + 1) = ForwardHillMuscleStep( T(:, k1 + 1), L(:, k1 + 1), dL(:, k1 + 1), A(:, k1 + 1), kse, kpe, b );
+
+
 
 
 end

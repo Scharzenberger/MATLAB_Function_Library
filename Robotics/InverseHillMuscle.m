@@ -15,7 +15,7 @@ function A = InverseHillMuscle(T, dT, L, dL, kse, kpe, b)
     % A = Muscle Activation.
     
 % Compute the muscle activation.
-A = (b/kse)*dT + (1 + (kpe/kse))*T - b*dL - kpe*L;
+A = (b./kse).*dT + (1 + (kpe./kse)).*T - b.*dL - kpe.*L;
 
 end
 
