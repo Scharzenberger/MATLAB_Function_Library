@@ -1,4 +1,4 @@
-function k_length = LengthTensionCurve( L, Lrest, Lwidth, k_width )
+function [k_length, Lwidth0] = LengthTensionCurve( L, Lrest, Lwidth, k_width )
 
 % This function computes the length factor used, along with the stimulus factor and maximum active muscle force, to compute the active force in a muscle.
 
@@ -15,7 +15,7 @@ function k_length = LengthTensionCurve( L, Lrest, Lwidth, k_width )
 if nargin < 4, k_width = 0; end       % Note that if k_width = 0, then Lwidth0 = Lwidth.  i.e., Lwidth is the muscle "width" at which the muscle produces zero force (since k_length = 0).
     
 % Compute the width of the parabola to its roots.
-Lwidth0 = Lwidth./sqrt(1 - k_width);
+Lwidth0 = GetMuscleRootWidth(Lwidth, k_width);
 
 % Compute the length factor.
 k_length = 1 - ((L - Lrest).^2)./(Lwidth0.^2);
