@@ -1,10 +1,10 @@
 function [ fig ] = MergeImages( fnames, tstrs )
 
 %Create a new figure on which to place the images.
-fig = figure;
+fig = figure('Color', 'w');
 
 %Determine how many rows and columns to use on the subplots.
-[ nrows, ncols ] = GetSubplotRCs( length(fnames), false );
+[ nrows, ncols ] = GetSubplotRCs( length(fnames), true );
 
 %Iterate through all of the filenames.
 for k = 1:length(fnames)
@@ -13,7 +13,7 @@ for k = 1:length(fnames)
     im = imread(fnames{k});
     
     %Create a subplot for the new image.
-    ax = subplot(nrows, ncols, k);
+    ax = subplot(nrows, ncols, k); axis equal
     
     %Put the image on the new subplot.
     image(im)
