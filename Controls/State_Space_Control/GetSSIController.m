@@ -12,8 +12,10 @@ if isa(G, 'tf'), G = ss(G); end
 %% Compute the SSI Gain Matrix.
 
 %Define the integrator system matrices.
-Ai = [G.a, zeros(size(G.a, 1), 1); -G.c, 0];
-Bi = [G.b; 0];
+% Ai = [G.a, zeros(size(G.a, 1), 1); -G.c, 0];
+% Bi = [G.b; 0];
+Ai = [G.a, zeros(size(G.a, 1), size(G.c, 1)); -G.c, zeros(size(G.c, 1), size(G.c, 1))];
+Bi = [G.b; zeros(size(G.c, 1), 1)];
 
 %Determine whether the system is controllable.
 if (size(Ai, 2) - rank(ctrb(Ai, Bi))) == 0                  %If the system is controllable...
