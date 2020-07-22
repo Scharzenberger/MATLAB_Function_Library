@@ -1,4 +1,7 @@
 
+% Clear Everything.
+clear, close('all'), clc
+
 % For figure
 set(0,'defaultfigurecolor', 'w');
 

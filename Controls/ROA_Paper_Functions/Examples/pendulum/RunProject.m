@@ -1,6 +1,8 @@
 
+clear, close('all'), clc
+
 % For figure
-set(0,'defaultfigurecolor', 'w');
+set(0, 'defaultfigurecolor', 'w');
 
 % Set options
 ProjectOptions = SetProjectOptions();
