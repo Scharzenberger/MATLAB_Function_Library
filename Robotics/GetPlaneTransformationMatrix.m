@@ -1,7 +1,7 @@
 function T = GetPlaneTransformationMatrix( Ps_plane, Pen_Vector )
 
 %This function takes in three points, Ps_plane, and determines the orientation of the associated plane, T.
-%This function also reports the width of the writing area defined by the three points.
+
 
 %% Compute the Plane Normal & Centroid.
 
@@ -31,15 +31,6 @@ P_centroid = [x_centroid y_centroid z_centroid]';
 
 %Define the z-axis of the plane orientation.
 zhat = N/norm(N);
-
-% %Determine whether it is necessary to switch the direction of the z axis.  The cross product above produces the correct z-axis up to the sign of the axis, so the sign may required the correction performed in the following if statement.
-% if (dot(zhat, P_centroid) > 0)                           %If the plane normal is pointing away from the origin...
-%     zhat = -zhat;                                       %Flip the plane normal.
-% elseif (dot(zhat, P_centroid) == 0)                      %If the plane normal is orthogonal to the origin....
-%     if ( sign(P_centroid(3) - 7) == sign(zhat(1)) )      %If the vector from the robot base to the centroid has the same sign as the normal...
-%         zhat = -zhat;                                   %Flip the plane normal.
-%     end
-% end
 
 %Determine whether it is necessary to switch the direction of the z axis.  The cross product above produces the correct z-axis up to the sign of the axis, so the sign may required the correction performed in the following if statement.
 if (dot(zhat, Pen_Vector) > 0)                           %If the plane normal is pointing away from the origin...

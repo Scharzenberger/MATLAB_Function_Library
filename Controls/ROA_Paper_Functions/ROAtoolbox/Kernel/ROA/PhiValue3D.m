@@ -9,9 +9,13 @@ function [meshxs, meshPhi] = PhiValue3D(projectoptions, fdata)
 % YUAN Guoqiang, Oct, 2016
 %
 
+% Retrieve the grid.
 g = projectoptions.Grid;
+
+% Define the ROA initial condition.
 sep = projectoptions.InitCircleCen;
 
+% Convert the nd grid to a mesh grid.
 [meshxs, meshPhi] = gridnd2mesh(g, fdata);
 % [meshX2, meshY2, meshZ2, meshPhi2] = subvolume( meshxs{:}, meshPhi, ...
 %                                                                         [sep(1),nan, sep(2),nan, nan,sep(3)]);

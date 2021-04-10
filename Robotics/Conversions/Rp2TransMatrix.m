@@ -26,7 +26,7 @@ end
 T = zeros(4, 4, size(p, 2));
 
 %Create transformation matrices.
-for k = 1:size(p, 2)                %Iterate through all of the points & orienations.
+for k = 1:size(p, 2)                %Iterate through all of the points & orienations...
     
     %Create transformation matrices.
     T(:, :, k) = [R(:, :, k), p(:, k); zeros(1, size(R(:, :, k), 2)) 1];

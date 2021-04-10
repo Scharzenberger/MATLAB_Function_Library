@@ -17,6 +17,7 @@ function [ nthetas, mpos ] = PlanLetterTrajectoryWithTravel( S, M, Tc, T_Plane, 
 %Organize the letter templates.
 Lpts = GetWordTemplatePoints( Ltr );
 
+
 %% Modified the Letter Template.
 
 %Center the letter template.
@@ -30,6 +31,7 @@ Lpts = T_Plane*SclMat*[Lpts; ones(1, size(Lpts, 2))];
 
 %Remove the additional row.  The additional row is necessary for use with the transformation matrices, but is not useful otherwise.
 Lpts(4, :) = [];
+
 
 %% Refine the Letter to Have an Appropriate Number of Steps.
 
@@ -48,6 +50,7 @@ T_Ltr = DescritizePath( T_Ltr, dtol_ltr );
 % %Retrieve the path positions for error computation and plotting purposes.
 % [ ~, Lpts ] = TransMatrix2Rp( T_Path );
 
+
 %% Add the Travel Path to the Letter Path.
 
 %Parameterize the path from the current position to the desired first letter position.
@@ -58,6 +61,7 @@ T_Path = cat(3, T_Travel, T_Ltr);
 
 %Retrieve the path positions for error computation and plotting purposes.
 [ ~, Lpts ] = TransMatrix2Rp( T_Path );
+
 
 %% Solve the Inverse Kinematics Problem (i.e., Determine Which Angles Produce the Desired Positions).
 

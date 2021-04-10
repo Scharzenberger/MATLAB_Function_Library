@@ -2,7 +2,7 @@ function g = GenerateGrid(ROAToolboxOptions)
 % Create the grid.
 % Parameters:
 %   ROAToolboxOptions  Project Options for ROAtoolbox
-%   g            Grid structure on which data was computed. 
+%   g            Grid structure on which data was computed.
 %                     g is ndgrid-based.
 %
 % YUAN Guoqiang, Oct, 2016

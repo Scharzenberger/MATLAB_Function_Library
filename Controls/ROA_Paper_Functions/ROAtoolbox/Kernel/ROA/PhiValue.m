@@ -1,12 +1,15 @@
 function [meshxs, meshPhi] = PhiValue(ProjectOptions, data)
 
 switch(ProjectOptions.Grid.dim)
- case 2
-    % 2D.    
-    [meshxs, meshPhi] = PhiValue2D(ProjectOptions, data);
- case 3
-    % 3D.
-    [meshxs, meshPhi] = PhiValue3D(ProjectOptions, data);
-  otherwise
-    error('Can not draw phi for system with dimention: %s!', g.dim);
+    case 2
+        % 2D.
+        [meshxs, meshPhi] = PhiValue2D(ProjectOptions, data);
+    case 3
+        % 3D.
+        [meshxs, meshPhi] = PhiValue3D(ProjectOptions, data);
+    case 4
+        % 4D.
+        [meshxs, meshPhi] = PhiValue4D(ProjectOptions, data);
+    otherwise
+        error('Can not draw phi for system with dimention: %s!', g.dim);
 end

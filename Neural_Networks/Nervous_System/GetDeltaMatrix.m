@@ -16,7 +16,7 @@ num_neurons = length(neuron_order);
 % Initialize the delta matrix to be completely bistable.
 deltas = delta_bistable*ones(num_neurons, num_neurons);
 
-% Switch thte desired synapses to be oscillatory.
+% Switch the desired synapses to be oscillatory.
 for k = 1:num_neurons
     
     % Compute the index of the next neuron in the chain.

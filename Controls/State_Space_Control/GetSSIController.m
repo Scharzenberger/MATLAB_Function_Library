@@ -12,8 +12,6 @@ if isa(G, 'tf'), G = ss(G); end
 %% Compute the SSI Gain Matrix.
 
 %Define the integrator system matrices.
-% Ai = [G.a, zeros(size(G.a, 1), 1); -G.c, 0];
-% Bi = [G.b; 0];
 Ai = [G.a, zeros(size(G.a, 1), size(G.c, 1)); -G.c, zeros(size(G.c, 1), size(G.c, 1))];
 Bi = [G.b; zeros(size(G.c, 1), 1)];
 
@@ -29,12 +27,8 @@ if (size(Ai, 2) - rank(ctrb(Ai, Bi))) == 0                  %If the system is co
     %% Compute the Closed Loop System SS Model.
     
     %Compute the SSI CL System matrices.
-%     Acl = [G.a - G.b*K(1:end-1), G.b*K(end); -G.c, 0];
-%     Bcl = [zeros(size(G.b, 1), 1); 1];
-%     Ccl = [G.c 0];
-%     Dcl = G.d;
     Acl = [G.a - G.b*K(1:end-1), G.b*K(end); -G.c, 0];
-    Bcl = [zeros(size(G.b)); ones(1, size(G.b, 2)) ];
+    Bcl = [zeros(size(G.b)); ones(1, size(G.b, 2))];
     Ccl = [G.c zeros(size(G.c, 1))];
     Dcl = G.d;    
 

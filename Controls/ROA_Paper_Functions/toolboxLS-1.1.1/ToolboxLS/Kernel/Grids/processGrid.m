@@ -52,7 +52,7 @@ function gridOut = processGrid(gridIn, data)
 %
 %     If any of the following fields are scalars, they are replicated
 %     gridIn.dim times: min, max, N, dx, bdry, bdryData.
-% 
+%
 %     In general, it is not necessary to supply the fields: vs, xs, axis, shape.
 %
 %     If one of N or dx is supplied, the other is inferred.
@@ -74,8 +74,8 @@ function gridOut = processGrid(gridIn, data)
 %   gridOut: the full structure described for gridIn above.
 
 % Copyright 2004 Ian M. Mitchell (mitchell@cs.ubc.ca).
-% This software is used, copied and distributed under the licensing 
-%   agreement contained in the file LICENSE in the top directory of 
+% This software is used, copied and distributed under the licensing
+%   agreement contained in the file LICENSE in the top directory of
 %   the distribution.
 %
 % Ian Mitchell, 1/22/03
@@ -84,287 +84,287 @@ function gridOut = processGrid(gridIn, data)
 %  new version  2/09/04 added field shape.
 %  new version  8/23/12 fixed some floating point problems with N and dx.
 
-  %----------------------------------------------------------------------------
-  defaultMin = 0;
-  defaultMax = 1;
-  defaultN = 101;
-  defaultBdry = @addGhostPeriodic;
-  defaultBdryData = [];
+%----------------------------------------------------------------------------
+defaultMin = 0;
+defaultMax = 1;
+defaultN = 101;
+defaultBdry = @addGhostPeriodic;
+defaultBdryData = [];
 
-  % This is just to avoid attempts to allocate 100 dimensional arrays.
-  maxDimension = 5;
+% This is just to avoid attempts to allocate 100 dimensional arrays.
+maxDimension = 5;
 
-  %----------------------------------------------------------------------------
-  if(~isstruct(gridIn))
+%----------------------------------------------------------------------------
+if(~isstruct(gridIn))
     if(numel(gridIn) == 1)
-      gridOut.dim = gridIn;
+        gridOut.dim = gridIn;
     elseif(ndims(gridIn) == 2)
-      % Should be a vector of node counts.
-      if(size(gridIn, 2) ~= 1)
-        error('gridIn vector must be a column vector');
-      else
-        gridOut.dim = length(gridIn);
-        gridOut.N = gridIn;
-      end
+        % Should be a vector of node counts.
+        if(size(gridIn, 2) ~= 1)
+            error('gridIn vector must be a column vector');
+        else
+            gridOut.dim = length(gridIn);
+            gridOut.N = gridIn;
+        end
     else
-      error('Unknown format for gridIn parameter');
+        error('Unknown format for gridIn parameter');
     end
-  else
+else
     gridOut = gridIn;
-  end
+end
 
 
-  %----------------------------------------------------------------------------
-  % Now we should have a partially complete structure in gridOut.
+%----------------------------------------------------------------------------
+% Now we should have a partially complete structure in gridOut.
 
-  if(isfield(gridOut, 'dim'))
+if(isfield(gridOut, 'dim'))
     if(gridOut.dim > maxDimension)
-      error('dimension > %d, may be dangerously large', maxDimension);
+        error('dimension > %d, may be dangerously large', maxDimension);
     end
     if(gridOut.dim < 0)
-      error('dimension must be positive');
+        error('dimension must be positive');
     end
-  else
+else
     error('grid structure must contain dimension');
-  end
+end
 
-  %----------------------------------------------------------------------------
-  % Process grid boundaries.
+%----------------------------------------------------------------------------
+% Process grid boundaries.
 
-  if(isfield(gridOut, 'min'))
+if(isfield(gridOut, 'min'))
     if(~isColumnLength(gridOut.min, gridOut.dim))
-      if(isscalar(gridOut.min))
-        gridOut.min = gridOut.min * ones(gridOut.dim, 1);
-      else
-        error('min field is not column vector of length dim or a scalar');
-      end
+        if(isscalar(gridOut.min))
+            gridOut.min = gridOut.min * ones(gridOut.dim, 1);
+        else
+            error('min field is not column vector of length dim or a scalar');
+        end
     end
-  else
+else
     gridOut.min = defaultMin * ones(gridOut.dim, 1);
-  end
+end
 
-  if(isfield(gridOut, 'max'))
+if(isfield(gridOut, 'max'))
     if(~isColumnLength(gridOut.max, gridOut.dim))
-      if(isscalar(gridOut.max))
-        gridOut.max = gridOut.max * ones(gridOut.dim, 1);
-      else
-        error('max field is not column vector of length dim or a scalar');
-      end
+        if(isscalar(gridOut.max))
+            gridOut.max = gridOut.max * ones(gridOut.dim, 1);
+        else
+            error('max field is not column vector of length dim or a scalar');
+        end
     end
-  else
+else
     gridOut.max = defaultMax * ones(gridOut.dim, 1);
-  end
+end
 
-  if(any(gridOut.max <= gridOut.min))
+if(any(gridOut.max <= gridOut.min))
     error('max bound must be strictly greater than min bound in all dimensions');
-  end
+end
 
-  %----------------------------------------------------------------------------
-  % Check N field if necessary.  If N is missing but dx is present, we will
-  % determine N later.
-  if(isfield(gridOut, 'N'))
+%----------------------------------------------------------------------------
+% Check N field if necessary.  If N is missing but dx is present, we will
+% determine N later.
+if(isfield(gridOut, 'N'))
     if(any(gridOut.N <= 0))
-      error('number of grid cells must be strictly positive'); 
+        error('number of grid cells must be strictly positive');
     end
     if(~isColumnLength(gridOut.N, gridOut.dim))
-      if(isscalar(gridOut.N))
-        gridOut.N = gridOut.N * ones(gridOut.dim, 1);
-      else
-        error('N field is not column vector of length dim or a scalar');
-      end
+        if(isscalar(gridOut.N))
+            gridOut.N = gridOut.N * ones(gridOut.dim, 1);
+        else
+            error('N field is not column vector of length dim or a scalar');
+        end
     end
-  end    
-  
-  %----------------------------------------------------------------------------
-  % Check dx field if necessary.  If dx is missing but N is present, infer
-  % dx.  If both are present, we will check for consistency later.  If
-  % neither are present, use the defaults.
-  if isfield(gridOut, 'dx')
+end
+
+%----------------------------------------------------------------------------
+% Check dx field if necessary.  If dx is missing but N is present, infer
+% dx.  If both are present, we will check for consistency later.  If
+% neither are present, use the defaults.
+if isfield(gridOut, 'dx')
     if(any(gridOut.dx <= 0))
-      error('grid cell size dx must be strictly positive');
+        error('grid cell size dx must be strictly positive');
     end
     if(~isColumnLength(gridOut.dx, gridOut.dim))
-      if(isscalar(gridOut.dx))
-        gridOut.dx = gridOut.dx * ones(gridOut.dim, 1);
-      else
-        error('dx field is not column vector of length dim or a scalar');
-      end
+        if(isscalar(gridOut.dx))
+            gridOut.dx = gridOut.dx * ones(gridOut.dim, 1);
+        else
+            error('dx field is not column vector of length dim or a scalar');
+        end
     end
-  elseif isfield(gridOut, 'N')
+elseif isfield(gridOut, 'N')
     % Only N field is present, so infer dx.
     gridOut.dx = (gridOut.max - gridOut.min) ./ (gridOut.N - 1);
-  else
+else
     % Neither field is present, so use default N and infer dx
     gridOut.N = defaultN * ones(gridOut.dim, 1);
     gridOut.dx = (gridOut.max - gridOut.min) ./ (gridOut.N - 1);
-  end
+end
 
-  %----------------------------------------------------------------------------
-  if(isfield(gridOut, 'vs'))
+%----------------------------------------------------------------------------
+if(isfield(gridOut, 'vs'))
     if(iscell(gridOut.vs))
-      if(~isColumnLength(gridOut.vs, gridOut.dim))
-        error('vs field is not column cell vector of length dim');
-      else
-        for i = 1 : gridOut.dim
-          if(~isColumnLength(gridOut.vs{i}, gridOut.N(i)))
-            error('vs cell entry is not correctly sized vector');
-          end
+        if(~isColumnLength(gridOut.vs, gridOut.dim))
+            error('vs field is not column cell vector of length dim');
+        else
+            for i = 1 : gridOut.dim
+                if(~isColumnLength(gridOut.vs{i}, gridOut.N(i)))
+                    error('vs cell entry is not correctly sized vector');
+                end
+            end
         end
-      end
     else
-      error('vs field is not a cell vector');
+        error('vs field is not a cell vector');
     end
-  else
+else
     gridOut.vs = cell(gridOut.dim, 1);
     for i = 1 : gridOut.dim
-      gridOut.vs{i} = (gridOut.min(i) : gridOut.dx(i) : gridOut.max(i))';
+        gridOut.vs{i} = (gridOut.min(i) : gridOut.dx(i) : gridOut.max(i))';
     end
-  end
+end
 
-  % Now we can check for consistency between dx and N, based on the size of
-  % the vectors in vs.  Note that if N is present, it will be a vector.  If
-  % N is not yet a field, set it to be consistent with the size of vs.
-  if isfield(gridOut, 'N')
+% Now we can check for consistency between dx and N, based on the size of
+% the vectors in vs.  Note that if N is present, it will be a vector.  If
+% N is not yet a field, set it to be consistent with the size of vs.
+if isfield(gridOut, 'N')
     for i = 1 : gridOut.dim
-      if(gridOut.N(i) ~= length(gridOut.vs{i}))
-        error('Inconsistent grid size in dimension %d', i);
-      end
+        if(gridOut.N(i) ~= length(gridOut.vs{i}))
+            error('Inconsistent grid size in dimension %d', i);
+        end
     end
-  else
+else
     gridOut.N = zeros(gridOut.dim, 1);
     for i = 1 : gridOut.dim
-      gridOut.N(i) = length(gridOut.vs{i});
+        gridOut.N(i) = length(gridOut.vs{i});
     end
-  end
-        
-  %----------------------------------------------------------------------------
-  if(isfield(gridOut, 'xs'))
+end
+
+%----------------------------------------------------------------------------
+if(isfield(gridOut, 'xs'))
     if(iscell(gridOut.xs))
-      if(~isColumnLength(gridOut.xs, gridOut.dim))
-        error('xs field is not column cell vector of length dim');
-      else
-        if(gridOut.dim > 1)
-          for i = 1 : gridOut.dim
-            if(any(size(gridOut.xs{i}) ~= gridOut.N'))
-              error('xs cell entry is not correctly sized array');
-            end
-          end
+        if(~isColumnLength(gridOut.xs, gridOut.dim))
+            error('xs field is not column cell vector of length dim');
         else
-          if(length(gridOut.xs{1}) ~= gridOut.N)
-            error('xs cell entry is not correctly sized array');
-          end
+            if(gridOut.dim > 1)
+                for i = 1 : gridOut.dim
+                    if(any(size(gridOut.xs{i}) ~= gridOut.N'))
+                        error('xs cell entry is not correctly sized array');
+                    end
+                end
+            else
+                if(length(gridOut.xs{1}) ~= gridOut.N)
+                    error('xs cell entry is not correctly sized array');
+                end
+            end
         end
-      end
     else
-      error('xs field is not a cell vector');
+        error('xs field is not a cell vector');
     end
-  else
+else
     gridOut.xs = cell(gridOut.dim, 1);
     if(gridOut.dim > 1)
-      [ gridOut.xs{:} ] = ndgrid(gridOut.vs{:});
+        [ gridOut.xs{:} ] = ndgrid(gridOut.vs{:});
     else
-      gridOut.xs{1} = gridOut.vs{1};
+        gridOut.xs{1} = gridOut.vs{1};
     end
-  end
+end
 
-  %----------------------------------------------------------------------------
-  if(isfield(gridOut, 'bdry'))
+%----------------------------------------------------------------------------
+if(isfield(gridOut, 'bdry'))
     if(iscell(gridOut.bdry))
-      if(~isColumnLength(gridOut.bdry, gridOut.dim))
-        error('bdry field is not column cell vector of length dim');
-      else
-        for i = 1 : gridOut.dim
-          % I don't know how to check if the entries are function handles
+        if(~isColumnLength(gridOut.bdry, gridOut.dim))
+            error('bdry field is not column cell vector of length dim');
+        else
+            for i = 1 : gridOut.dim
+                % I don't know how to check if the entries are function handles
+            end
         end
-      end
     else
-      if(isscalar(gridOut.bdry))
-        bdry = gridOut.bdry;
-        gridOut.bdry = cell(gridOut.dim, 1);
-        [ gridOut.bdry{:} ] = deal(bdry);
-      else
-        error('bdry field is not a cell vector or a scalar');
-      end
+        if(isscalar(gridOut.bdry))
+            bdry = gridOut.bdry;
+            gridOut.bdry = cell(gridOut.dim, 1);
+            [ gridOut.bdry{:} ] = deal(bdry);
+        else
+            error('bdry field is not a cell vector or a scalar');
+        end
     end
-  else
+else
     gridOut.bdry = cell(gridOut.dim, 1);
     [ gridOut.bdry{:} ] = deal(defaultBdry);
-  end
+end
 
-  %----------------------------------------------------------------------------
-  if(isfield(gridOut, 'bdryData'))
+%----------------------------------------------------------------------------
+if(isfield(gridOut, 'bdryData'))
     if(iscell(gridOut.bdryData))
-      if(~isColumnLength(gridOut.bdryData, gridOut.dim))
-        error('bdryData field is not column cell vector of length dim');
-      else
-        for i = 1 : gridOut.dim
-          % Don't know whether it is worth checking that entries are structures
+        if(~isColumnLength(gridOut.bdryData, gridOut.dim))
+            error('bdryData field is not column cell vector of length dim');
+        else
+            for i = 1 : gridOut.dim
+                % Don't know whether it is worth checking that entries are structures
+            end
         end
-      end
     else
-      if(isscalar(gridOut.bdryData))
-        bdryData = gridOut.bdryData;
-        gridOut.bdryData = cell(gridOut.dim, 1);
-        [ gridOut.bdryData{:} ] = deal(bdryData);
-      else
-        error('bdryData field is not a cell vector or a scalar');
-      end
+        if(isscalar(gridOut.bdryData))
+            bdryData = gridOut.bdryData;
+            gridOut.bdryData = cell(gridOut.dim, 1);
+            [ gridOut.bdryData{:} ] = deal(bdryData);
+        else
+            error('bdryData field is not a cell vector or a scalar');
+        end
     end
-  else
+else
     gridOut.bdryData = cell(gridOut.dim, 1);
     [ gridOut.bdryData{:} ] = deal(defaultBdryData);
-  end
+end
 
-  %----------------------------------------------------------------------------
-  if((gridOut.dim == 2) || (gridOut.dim == 3))
+%----------------------------------------------------------------------------
+if((gridOut.dim == 2) || (gridOut.dim == 3))
     if(isfield(gridOut, 'axis'))
-      for i = 1 : gridOut.dim
-        if(gridOut.axis(2 * i - 1) ~= gridOut.min(i))
-          error('axis and min fields do not agree');
+        for i = 1 : gridOut.dim
+            if(gridOut.axis(2 * i - 1) ~= gridOut.min(i))
+                error('axis and min fields do not agree');
+            end
+            if(gridOut.axis(2 * i)     ~= gridOut.max(i))
+                error('axis and max fields do not agree');
+            end
         end
-        if(gridOut.axis(2 * i)     ~= gridOut.max(i))
-          error('axis and max fields do not agree');
-        end
-      end
     else
-      gridOut.axis = zeros(1, 2 * gridOut.dim);
-      for i = 1 : gridOut.dim
-        gridOut.axis(2 * i - 1 : 2 * i) = [ gridOut.min(i), gridOut.max(i) ];
-      end
+        gridOut.axis = zeros(1, 2 * gridOut.dim);
+        for i = 1 : gridOut.dim
+            gridOut.axis(2 * i - 1 : 2 * i) = [ gridOut.min(i), gridOut.max(i) ];
+        end
     end
-  else
+else
     gridOut.axis = [];
-  end
+end
 
-  %----------------------------------------------------------------------------
-  if(isfield(gridOut, 'shape'))
+%----------------------------------------------------------------------------
+if(isfield(gridOut, 'shape'))
     if(gridOut.dim == 1)
-      if(any(gridOut.shape ~= [ gridOut.N, 1 ]))
-        error('shape and N fields do not agree');
-      end
+        if(any(gridOut.shape ~= [ gridOut.N, 1 ]))
+            error('shape and N fields do not agree');
+        end
     else
-      if(any(gridOut.shape ~= gridOut.N'))
-        error('shape and N fields do not agree');
-      end
+        if(any(gridOut.shape ~= gridOut.N'))
+            error('shape and N fields do not agree');
+        end
     end
-  else
+else
     if(gridOut.dim == 1)
-      gridOut.shape = [ gridOut.N, 1 ];
+        gridOut.shape = [ gridOut.N, 1 ];
     else
-      gridOut.shape = gridOut.N';
+        gridOut.shape = gridOut.N';
     end
-  end
+end
 
-  %----------------------------------------------------------------------------
-  % check data parameter for consistency
-  if(nargin > 1)
+%----------------------------------------------------------------------------
+% check data parameter for consistency
+if(nargin > 1)
     if(ndims(data) ~= length(gridOut.shape))
-      error('data parameter does not agree in dimension with grid');
+        error('data parameter does not agree in dimension with grid');
     end
     if(any(size(data) ~= gridOut.shape))
-      error('data parameter does not agree in array size with grid');
+        error('data parameter does not agree in array size with grid');
     end
-  end
+end
 
 end % processGrid().
 
@@ -376,8 +376,8 @@ function bool = isColumnLength(array, vectorLength)
 %
 % helper function to check that an array is a column vector of some length
 
-  bool = ((ndims(array) == 2) & ...
-          (size(array, 1) == vectorLength) & (size(array, 2) == 1));
+bool = ((ndims(array) == 2) & ...
+    (size(array, 1) == vectorLength) & (size(array, 2) == 1));
 
 end % isColumnLength().
 
@@ -389,6 +389,6 @@ function bool = isscalar(array)
 %
 % helper function which checks whether the array is a scalar
 
-  bool = (numel(array) == 1);
+bool = (numel(array) == 1);
 
 end % isscalar().

@@ -6,16 +6,19 @@ function ROAToolboxOptions = SetProjectOptions()
 %
 %% Parameters for creating computational grid
 % The dimension of the grid should equal to to number of  state variables
-ROAToolboxOptions.GridDimension = 4; 
+ROAToolboxOptions.GridDimension = 2; 
 % The toolboxLS-1.1.1 work best if all the dimension in the problem are
 %   approximately the same size: for example, the grid ranges and cell
 %   widths should be within an order of magnitude of one another. So the
 %   next two parameters should be approximately same.
 % The range of each dimension i.e. [x1min, x1max; x2min, x2max; x3min, x3max ...]
-ROAToolboxOptions.GridRange = [-10, 10; -10, 10; -10, 10; -10, 10];
+% ROAToolboxOptions.GridRange = [-10, 10; -10, 10];
+ROAToolboxOptions.GridRange = [-2*pi, 2*pi; -2*pi, 2*pi];
+% ROAToolboxOptions.GridRange = 2*[-2*pi, 2*pi; -2*pi, 2*pi];
+
 % A column vector specifying the size of grid cell in each dimension
 %  i.e. [x1cellsize; x2cellsize; x3cellsize ...]
-ROAToolboxOptions.GridCellSize = [0.2; 0.2; 0.2; 0.2];
+ROAToolboxOptions.GridCellSize = [0.2; 0.2];
 % A column vector specifying the number of grid nodes in each dimension.
 %   this parameter can be automatically generated from GridRange and
 %   GridCellSize.
@@ -27,7 +30,7 @@ ROAToolboxOptions.GridCellSize = [0.2; 0.2; 0.2; 0.2];
 %   InitCircleRad is the  Radius of initial circle (positive).
 %   InitCircleCen is the  center of initial circle (column vector [x1; x2; x3 ...]).
 ROAToolboxOptions.InitCircleRad = 1;
-ROAToolboxOptions.InitCircleCen = [ 0; 0; 0; 0 ];
+ROAToolboxOptions.InitCircleCen = [ 0; 0 ];
 
 %% Parameters for integrating
 % End time for integrate.
@@ -69,20 +72,28 @@ function VectorField = GenVecField( xs )
 %
 if iscell(xs)  % element-wise
     % -----------------------------------------------------------------------
-    % ---------Modify according to the undetlying system------------
-    [x1, x2, x3, x4] = xs{:};
+    
+    % Retrieve the components of the input vector.
+    [x1, x2] = xs{:};
 
-    % The  dynamics equation
-    % Use Element-wise operator
+    % Define the pendulum parameters.
+    m = 1;
+    L = 1;
+    g = 9.81;
+    c = 1;
+%     ktau = 1;
+    ktau = 0;
+    kmotor = 1;
+    u = 0;
 
+    % Define the nonlinear simple pendulum dynamics.
     x1dot = x2;
-    x2dot = (7*sin(x3).*x4.^2)./(6*cos(x3).^2 - 28) + (6*cos(x3).*x4)./(3*cos(x3).^2 - 14) + (7*x1)./(3*cos(x3).^2 - 14) + (7*x2)./(3*cos(x3).^2 - 14) + (6*x3.*cos(x3))./(3*cos(x3).^2 - 14) - (2943*cos(x3).*sin(x3))./(300*cos(x3).^2 - 1400);
-    x3dot = x4;
-    x4dot = (3*cos(x3).*sin(x3).*x4.^2)./(3*cos(x3).^2 - 14) + (24*x4)./(3*cos(x3).^2 - 14) + (24*x3)./(3*cos(x3).^2 - 14) - (2943*sin(x3))./(75*cos(x3).^2 - 350) + (6*x1.*cos(x3))./(3*cos(x3).^2 - 14) + (6*x2.*cos(x3))./(3*cos(x3).^2 - 14);
+    x2dot = (-ktau./(m*(L.^2))).*x1 + (-g./L).*sin(x1) + (-c./(m.*(L.^2))).*x2 + (kmotor./(m*(L.^2)))*u;
+
+%     x1dot = x2;
+%     x2dot = -10 * sin(x1) - x2 ;
     
-    VectorField = { x1dot; x2dot; x3dot; x4dot};
-    
-    % -----------------------------------------------------------------------    
+    VectorField = { x1dot;   x2dot};
     % -----------------------------------------------------------------------    
 else   % scalar
     % Do not change
